@@ -1,13 +1,27 @@
 package com.hmdp;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hmdp.dto.UserDTO;
+import com.hmdp.entity.User;
+import com.hmdp.service.IUserService;
 import com.hmdp.service.impl.ShopServiceImpl;
+import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.RedisIdWorker;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +34,7 @@ public class HmDianPingApplicationTests {
     // redisson客户端
     @Resource
     private RedissonClient redissonClient;
+
     @Test
     void testRedisson() throws InterruptedException {
         // 获取可重入锁，指定锁名称
@@ -83,5 +98,43 @@ public class HmDianPingApplicationTests {
         // 使用一个固定大小为500的线程池并发地运行300个任务。
         // 通过CountDownLatch等待所有任务完成后，计算整个任务执行所用的时间，并打印出来。
         // 通过这种方式，代码测试了RedisIdWorker类的nextId方法在高并发场景下的性能和生成ID的稳定性。
+    }
+
+
+    @Resource
+    private IUserService userService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 生成1000个token
+     * 并且将token写入redis
+     *
+     * @throws Exception
+     */
+    @Test
+    public void generateToken() throws Exception {
+        // 数据库查询1000个用户的信息
+        List<User> list = userService.list(new QueryWrapper<User>().last("limit 1000"));
+        // 创建字符输入流准备写入token到文件
+        BufferedWriter br = new BufferedWriter(new FileWriter("C:\\Users\\bfs\\Desktop\\Redis\\实战篇\\Tokens.txt"));
+        for (User user : list) {
+            // 随机生成token作为登录令牌
+            String token = UUID.randomUUID().toString(true);
+            // 将User对象转为HashMap存储到Redis中
+            UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+            Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
+                    CopyOptions.create() // 用于创建一个CopyOptions实例，以便后续对转换过程进行配置
+                            .setIgnoreNullValue(true) // 忽略null值
+                            .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString())); // 将所有键值对的值转化为String
+            //保存用户信息到Redis中
+            String tokenKey = RedisConstants.LOGIN_USER_KEY + token;
+            stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
+            stringRedisTemplate.expire(tokenKey, RedisConstants.LOGIN_USER_TTL, TimeUnit.MINUTES);
+            //写入token到文件
+            br.write(token);
+            br.newLine();
+            br.flush();
+        }
     }
 }

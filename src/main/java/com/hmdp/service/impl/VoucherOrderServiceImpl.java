@@ -97,7 +97,6 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             log.error("不能重复下单");
             return;
         }
-
         try {
             // 事务代理，防止失效
             // 注意：有无spring的事务放在threadLocal中，此时的是多线程，事务会失效
@@ -139,13 +138,13 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         voucherOrder.setVoucherId(voucherId);
         // 保存到阻塞队列
         orderTasks.add(voucherOrder);
-        // 获取代理对象
+        // 获取代理对象解决事务方法被其他方法调用，事务失效的问题
         proxy = (IVoucherOrderService) AopContext.currentProxy();
         // 3. 返回订单id
         return Result.ok(orderId);
-
     }
 
+    // 穿行执行
 //    @Override
 //    public Result secKillVoucher(Long voucherId) {
 //        // 1. 查询优惠券
@@ -186,6 +185,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 //    }
 
     /**
+     * 创建订单
      * 用户超卖，加锁，一人一单
      *
      * @param voucherOrder 优惠券信息
@@ -196,7 +196,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         // 子线程不能通过threadLocal获取
 //        Long userId = UserHolder.getUser().getId();
         Long userId = voucherOrder.getUserId();
-        Long voucherId = voucherOrder.getId();
+        Long voucherId = voucherOrder.getVoucherId();
         // 5.1.查询订单
         long count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
         // 5.2.判断是否存在

@@ -14,11 +14,22 @@ import java.time.format.DateTimeFormatter;
 public class RedisIdWorker {
     private final StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 构造函数
+     *
+     * @param stringRedisTemplate 注入
+     */
     public RedisIdWorker(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
-    private static final long BEGIN_TIMESTAMP = 1640995200L; // 使用main方法生成的起始时间的时间戳
+    /**
+     * 生成起始时间的时间戳
+     */
+    private static final long BEGIN_TIMESTAMP = 1640995200L; // main方法生成
+    /**
+     * 左移32位
+     */
     public static final long COUNT_BITS = 32;
 
     /**
@@ -30,7 +41,7 @@ public class RedisIdWorker {
     public long nextId(String keyPrefix) {
         // 1. 生成时间戳
         LocalDateTime now = LocalDateTime.now();
-        long nowSecond = now.toEpochSecond(ZoneOffset.UTC);
+        long nowSecond = now.toEpochSecond(ZoneOffset.UTC); // 秒数
         long timestamp = nowSecond - BEGIN_TIMESTAMP;
 
         // 2. 生成序列号
