@@ -34,6 +34,9 @@ public class RedisConstants {
      * 订单锁，后面拼接用户（id）
      */
     public static final String LOCK_ORDER_KEY = "lock:order:";
+    /**
+     * 用户是否点赞
+     */
     public static final String BLOG_LIKED_KEY = "blog:liked:";
     public static final String FEED_KEY = "feed:";
     public static final String SHOP_GEO_KEY = "shop:geo:";
