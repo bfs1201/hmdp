@@ -4,6 +4,8 @@ import com.hmdp.dto.Result;
 import com.hmdp.entity.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 public interface IBlogService extends IService<Blog> {
 
     /**
@@ -36,4 +38,12 @@ public interface IBlogService extends IService<Blog> {
      * @return
      */
     Result queryHotBlog(Integer current);
+
+    /**
+     * 分页查询
+     * @param current
+     * @param userId
+     * @return
+     */
+    List<Blog> pageQueryByUserId(Integer current, Long userId);
 }

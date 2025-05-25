@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hmdp.utils.RedisConstants.BLOG_LIKED_KEY;
+import static com.hmdp.utils.SystemConstants.MAX_PAGE_SIZE;
 
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IBlogService {
@@ -172,7 +173,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     @Override
     public Result queryHotBlog(Integer current) {
         // 根据用户分页查询
-        Page<Blog> blogPage = new Page<>(current, SystemConstants.MAX_PAGE_SIZE);
+        Page<Blog> blogPage = new Page<>(current, MAX_PAGE_SIZE);
         LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<Blog>()
                 .orderByDesc(Blog::getLiked)
                 .select();
@@ -190,5 +191,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             isBlogLiked(blog);
         });
         return Result.ok(records);
+    }
+
+    /**
+     * 分页查询
+     * @param current
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<Blog> pageQueryByUserId(Integer current, Long userId) {
+        Page<Blog> blogPage = blogMapper.selectPage(
+                new Page<>(current, MAX_PAGE_SIZE),
+                new LambdaQueryWrapper<Blog>().eq(Blog::getUserId, userId));
+        return blogPage.getRecords();
     }
 }

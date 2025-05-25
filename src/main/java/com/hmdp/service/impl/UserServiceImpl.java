@@ -205,6 +205,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.delete(key);
     }
 
+    @Override
+    public UserDTO queryUser(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return null;
+        }
+        return BeanUtil.copyProperties(user, UserDTO.class);
+    }
+
     private User createUserWithPhone(String phone) {
         // 1. 创建一个用户，给手机号，给一个随机昵称
         User user = User.builder()

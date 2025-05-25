@@ -84,11 +84,28 @@ public class BlogController {
 
     /**
      * 根据点赞数分页查询，最热blog 10条
+     *
      * @param current
      * @return
      */
     @GetMapping("/hot")
     public Result queryHotBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         return blogService.queryHotBlog(current);
+    }
+
+    /**
+     * 分页查询用户发布的博客
+     * 根据用户id分页查询所发博客
+     *
+     * @param current
+     * @param userId
+     * @return
+     */
+    @GetMapping("/of/user")
+    public Result queryBlogByUserId(
+            @RequestParam(value = "current", defaultValue = "1") Integer current,
+            @RequestParam("id") Long userId) {
+        List<Blog> blogList = blogService.pageQueryByUserId(current, userId);
+        return Result.ok(blogList);
     }
 }

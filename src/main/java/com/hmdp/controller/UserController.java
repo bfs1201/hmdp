@@ -5,8 +5,10 @@ import cn.hutool.core.util.RandomUtil;
 import com.hmdp.dto.LoginFormDTO;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
+import com.hmdp.entity.Blog;
 import com.hmdp.entity.User;
 import com.hmdp.entity.UserInfo;
+import com.hmdp.service.IBlogService;
 import com.hmdp.service.IUserInfoService;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RegexUtils;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,7 +28,6 @@ public class UserController {
 
     @Resource
     private IUserService userService;
-
     @Resource
     private IUserInfoService userInfoService;
 
@@ -80,4 +82,17 @@ public class UserController {
         // 返回
         return Result.ok(info);
     }
+
+    /**
+     * 根据id获取用户详情
+     * @param userId
+     * @return
+     */
+    @GetMapping("/{id}")
+    public Result queryUserById(@PathVariable("id") Long userId) {
+        UserDTO userDTO = userService.queryUser(userId);
+        return Result.ok(userDTO);
+    }
+
+
 }
