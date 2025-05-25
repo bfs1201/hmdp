@@ -174,7 +174,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         // 根据用户分页查询
         Page<Blog> blogPage = new Page<>(current, SystemConstants.MAX_PAGE_SIZE);
         LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<Blog>()
-                .orderByDesc(Blog::getLiked).select();
+                .orderByDesc(Blog::getLiked)
+                .select();
         Page<Blog> page = blogMapper.selectPage(blogPage, queryWrapper);
 //        Page<Blog> page = blogService.query()
 //                .orderByDesc("liked")
