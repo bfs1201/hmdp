@@ -15,16 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-/**
- * <p>
- * 前端控制器
- * </p>
- *
- * @author 虎哥
- * @since 2021-12-22
- */
 @Slf4j
 @RestController
 @RequestMapping("/user")
@@ -46,31 +39,36 @@ public class UserController {
 
     /**
      * 登录功能
+     *
      * @param loginForm 登录参数，包含手机号、验证码；或者手机号、密码
      */
     @PostMapping("/login")
-    public Result login(@RequestBody LoginFormDTO loginForm, HttpSession session){
+    public Result login(@RequestBody LoginFormDTO loginForm, HttpSession session) {
         return userService.login(loginForm, session);
     }
 
     /**
      * 登出功能
-     * @return 无
+     * 删除redis中的token对应的key
+     *
+     * @param request
+     * @return
      */
     @PostMapping("/logout")
-    public Result logout(){
-        // TODO 实现登出功能
-        return Result.fail("功能未完成");
+    public Result logout(HttpServletRequest request) {
+        String token = request.getHeader("authorization");
+        userService.logout(token);
+        return Result.ok();
     }
 
     @GetMapping("/me")
-    public Result me(){
+    public Result me() {
         UserDTO user = UserHolder.getUser();
         return Result.ok(user);
     }
 
     @GetMapping("/info/{id}")
-    public Result info(@PathVariable("id") Long userId){
+    public Result info(@PathVariable("id") Long userId) {
         // 查询详情
         UserInfo info = userInfoService.getById(userId);
         if (info == null) {

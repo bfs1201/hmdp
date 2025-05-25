@@ -1,11 +1,9 @@
 package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.LoginFormDTO;
 import com.hmdp.dto.Result;
@@ -14,28 +12,21 @@ import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RegexUtils;
+import com.hmdp.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.*;
 import static com.hmdp.utils.SystemConstants.USER_NICK_NAME_PREFIX;
 
-/**
- * <p>
- * 服务实现类
- * </p>
- *
- * @author 虎哥
- * @since 2021-12-22
- */
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
@@ -66,7 +57,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        return Result.ok();
 //    }
 
-    // redis实现
+    /**
+     * 发送验证码
+     *
+     * @param phone
+     * @param session
+     * @return
+     */
     @Override
     public Result sendCode(String phone, HttpSession session) {
         // 1. 校验手机号
@@ -126,6 +123,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        // 6. 200
 //        return Result.ok();
 //    }
+
+    /**
+     * 登录
+     *
+     * @param loginForm
+     * @param session
+     * @return
+     */
     @Override
     public Result login(LoginFormDTO loginForm, HttpSession session) {
         // 1. 校验手机号
@@ -186,6 +191,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL * 100, TimeUnit.MINUTES); // 方便调试，这里过期时间设置100倍
         // 6. 200->返回token给前端
         return Result.ok(token);
+    }
+
+    /**
+     * 登出功能
+     * 删除redis中的token对应的key
+     *
+     * @param token
+     */
+    @Override
+    public void logout(String token) {
+        String key = LOGIN_USER_KEY + token;
+        stringRedisTemplate.delete(key);
     }
 
     private User createUserWithPhone(String phone) {

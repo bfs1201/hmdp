@@ -30,7 +30,7 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
     public Result follow(Long followedId, Boolean isFollow) {
         // 1. 获取登录用户
         Long userId = UserHolder.getUser().getId();
-        String key = BLOG_FOLLOW_KEY + userId;
+//        String key = BLOG_FOLLOW_KEY + userId;
 
         // 2. 判断是 关注 还是 取关
         boolean isSuccess;
