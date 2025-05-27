@@ -10,6 +10,11 @@ import com.hmdp.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -54,6 +59,8 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private IVoucherOrderService proxy;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     // 在类初始化之后执行，因为当这个类初始化好了之后，随时都是由可能要执行的
     @PostConstruct
@@ -136,8 +143,12 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         voucherOrder.setUserId(userId);
         // 代金券ID
         voucherOrder.setVoucherId(voucherId);
-        // 保存到阻塞队列
-        orderTasks.add(voucherOrder);
+//        // 保存到阻塞队列
+//        orderTasks.add(voucherOrder);
+
+        // 将订单信息发送到消息队列
+        rabbitTemplate.convertAndSend("hmdp.direct", "voucher.order", voucherOrder);
+
         // 获取代理对象解决事务方法被其他方法调用，事务失效的问题
         proxy = (IVoucherOrderService) AopContext.currentProxy();
         // 3. 返回订单id

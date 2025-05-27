@@ -52,10 +52,14 @@ public class HmDianPingApplicationTests {
         }
     }
 
+    /**
+     * 热点Key预热
+     * 预热所有商店信息
+     */
     @Test
     public void testLogicalExpire() {
         // 存储9个商铺信息
-        for (int i = 1; i <= 9; i++) {
+        for (int i = 1; i <= 14; i++) {
             shopService.saveLogicalExpireToRedis((long) i, 10L);
         }
     }
