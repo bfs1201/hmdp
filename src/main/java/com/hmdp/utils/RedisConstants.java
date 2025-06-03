@@ -42,7 +42,10 @@ public class RedisConstants {
      * 博客关注
      */
     public static final String BLOG_FOLLOW_KEY = "blog:follow:";
-    public static final String FEED_KEY = "feed:";
+    /**
+     * 关注推送，推送给粉丝
+     */
+    public static final String BLOG_FEED_KEY = "blog:feed:"; // feed流
     public static final String SHOP_GEO_KEY = "shop:geo:";
     public static final String USER_SIGN_KEY = "sign:";
 }

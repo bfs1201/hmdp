@@ -58,7 +58,7 @@ public class HmDianPingApplicationTests {
      */
     @Test
     public void testLogicalExpire() {
-        // 存储9个商铺信息
+        // 存储所有商铺信息
         for (int i = 1; i <= 14; i++) {
             shopService.saveLogicalExpireToRedis((long) i, 10L);
         }

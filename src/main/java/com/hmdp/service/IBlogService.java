@@ -46,4 +46,16 @@ public interface IBlogService extends IService<Blog> {
      * @return
      */
     List<Blog> pageQueryByUserId(Integer current, Long userId);
+
+    /**
+     * /**
+     *      * 保存文章
+     *      * feed流推送（推送给粉丝redis）
+     *      *
+     *      * @param blog
+     *      * @return
+     *      */
+    Result saveBlog(Blog blog);
+
+    Result queryBlogOfFans(Long max, Integer offset);
 }

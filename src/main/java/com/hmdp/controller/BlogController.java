@@ -22,19 +22,14 @@ public class BlogController {
 
     /**
      * 保存文章
+     * feed流推送（推送给粉丝redis）
      *
      * @param blog
      * @return
      */
     @PostMapping
     public Result saveBlog(@RequestBody Blog blog) {
-        // 获取登录用户
-        UserDTO user = UserHolder.getUser();
-        blog.setUserId(user.getId());
-        // 保存探店博文
-        blogService.save(blog);
-        // 返回id
-        return Result.ok(blog.getId());
+        return blogService.saveBlog(blog);
     }
 
     /**
@@ -107,5 +102,19 @@ public class BlogController {
             @RequestParam("id") Long userId) {
         List<Blog> blogList = blogService.pageQueryByUserId(current, userId);
         return Result.ok(blogList);
+    }
+
+    /**
+     * 分页查询收邮箱(接收文章的箱子)
+     *
+     * @param max
+     * @param offset
+     * @return
+     */
+    @GetMapping("/of/follow")
+    public Result queryBlogOfFans(
+            @RequestParam("lastId") Long max,
+            @RequestParam(value = "offset", defaultValue = "0") Integer offset) {
+        return blogService.queryBlogOfFans(max, offset);
     }
 }
