@@ -46,4 +46,8 @@ public interface IUserService extends IService<User> {
     void logout(String token);
 
     UserDTO queryUser(Long userId);
+
+    void sign();
+
+    Result signCount();
 }
