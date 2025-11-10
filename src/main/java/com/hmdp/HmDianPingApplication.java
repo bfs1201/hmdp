@@ -21,6 +21,7 @@ public class HmDianPingApplication {
 
     @PostConstruct
     public void init() {
+        // TODO查询所有商铺ID，遍历ID列表，缓存数据
         // 预热逻辑：存储所有商铺信息到 Redis
         for (int i = 1; i <= 14; i++) {
             shopService.saveLogicalExpireToRedis((long) i, 10L);

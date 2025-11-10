@@ -89,7 +89,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         // 视图层渲染结束，最后执行
-        // 从threadLocal中移除用户信息
+        // 从threadLocal中移除用户信息，防止内存泄漏
         UserHolder.removeUser();
     }
 }
