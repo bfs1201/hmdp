@@ -1,5 +1,6 @@
 package com.hmdp;
 
+import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.List;
 
 @EnableAspectJAutoProxy(exposeProxy = true)
 @MapperScan("com.hmdp.mapper")
@@ -18,14 +20,18 @@ import javax.annotation.Resource;
 public class HmDianPingApplication {
     @Resource
     private IShopService shopService;
+    @Resource
+    private ShopMapper shoMapper;
 
     @PostConstruct
     public void init() {
-        // TODO查询所有商铺ID，遍历ID列表，缓存数据
+        /*// 查询所有商铺ID，遍历ID列表，缓存数据
+        List<Long> shopIds = shoMapper.selectAllShopId();
         // 预热逻辑：存储所有商铺信息到 Redis
-        for (int i = 1; i <= 14; i++) {
-            shopService.saveLogicalExpireToRedis((long) i, 10L);
-        }
+        for (long i : shopIds) {
+            shopService.saveLogicalExpireToRedis(i, 10L);
+        }*/
+        shopService.preheatAllShopInfo(10L);
     }
 
 

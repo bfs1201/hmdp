@@ -11,4 +11,11 @@ public interface IShopService extends IService<Shop> {
     Result updateShopById(Shop shop);
 
     void saveLogicalExpireToRedis(Long id, Long expireTime);
+
+    /**
+     * 预热所有商铺信息到redis
+     *
+     * @param expireTime
+     */
+    void preheatAllShopInfo(long expireTime);
 }
